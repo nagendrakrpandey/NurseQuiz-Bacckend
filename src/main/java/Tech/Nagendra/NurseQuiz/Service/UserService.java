@@ -202,7 +202,8 @@ public class UserService {
 
         userRepository.save(existingUser);
 
-        String resetLink = "http://localhost:8080/reset-password/" + token;
+       // String resetLink = "http://localhost:8080/reset-password/" + token;
+        String resetLink = "https://nursequia-ui.vercel.app/reset-password/" + token;
         String subject = "NurseQuiz Password Reset";
         String body = "Click this link to reset your password:\n\n" + resetLink + "\n\nThis link will expire in 15 minutes.";
         emailService.sendSimpleEmail(existingUser.getEmail(), subject, body);

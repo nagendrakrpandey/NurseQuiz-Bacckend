@@ -15,7 +15,6 @@ public interface CandidateResponseRepository extends JpaRepository<CandidateResp
     List<CandidateResponse> findByBatchCode(String batchCode);
     @Query(value =
             "SELECT " +
-                    "b.qb_id AS qbId, " +
                     "b.id AS questionId, " +
                     "b.text AS question, " +
                     "b.optiona AS optiona, " +
