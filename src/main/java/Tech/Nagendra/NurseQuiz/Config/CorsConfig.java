@@ -12,10 +12,8 @@ public class CorsConfig implements WebMvcConfigurer {
 
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "http://localhost:5173",
-                        "http://localhost:3000",
                         "http://localhost:8080",
-                        "https://amino-viability-clobber.ngrok-free.dev"
+                        "https://nursequiz-ui.vercel.app/"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
