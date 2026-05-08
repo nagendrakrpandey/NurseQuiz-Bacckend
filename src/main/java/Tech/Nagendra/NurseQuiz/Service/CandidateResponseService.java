@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CandidateResponseService {
@@ -20,7 +21,6 @@ public class CandidateResponseService {
     @Autowired
     private QuestionRepository questionRepository;
 
-    // ✅ FIXED SAVE METHOD (NO CRASH)
     public CandidateResponse saveResponse(CandidateResponse request) {
 
         System.out.println("📩 Incoming Request: " + request);
@@ -39,35 +39,55 @@ public class CandidateResponseService {
             }
         }
 
-        // ✅ always set fields
-        request.setIsCorrect(isCorrect);
-        request.setSubmitTime(LocalDateTime.now());
-        request.setIsActive(true);
-        request.setCreatedOn(LocalDateTime.now());
+        Optional<CandidateResponse> existingResponse =
+                responseRepository.findByCandidateIdAndQuestionId(
+                        request.getCandidateId(),
+                        request.getQuestionId()
+                );
 
-        CandidateResponse saved = responseRepository.save(request);
+        CandidateResponse response;
+
+        if (existingResponse.isPresent()) {
+            response = existingResponse.get();
+
+            response.setAnsId(request.getAnsId());
+            response.setTabSwitchCount(request.getTabSwitchCount());
+            response.setLatitude(request.getLatitude());
+            response.setLongitude(request.getLongitude());
+            response.setLocationName(request.getLocationName());
+            response.setIsCorrect(isCorrect);
+            response.setSubmitTime(LocalDateTime.now());
+            response.setModifiedOn(LocalDateTime.now());
+            response.setModifiedBy(request.getModifiedBy());
+
+        } else {
+            response = request;
+
+            response.setIsCorrect(isCorrect);
+            response.setSubmitTime(LocalDateTime.now());
+            response.setIsActive(true);
+            response.setCreatedOn(LocalDateTime.now());
+        }
+
+        CandidateResponse saved = responseRepository.save(response);
 
         System.out.println("✅ Saved Response ID: " + saved.getRecordId());
 
         return saved;
     }
 
-    // ✅ GET ALL
     public List<CandidateResponse> getAllResponses() {
         return responseRepository.findAll();
     }
 
-    // ✅ GET BY CANDIDATE
     public List<CandidateResponse> getByCandidateId(Long candidateId) {
         return responseRepository.findByCandidateId(candidateId);
     }
 
-    // ✅ GET BY BATCH
     public List<CandidateResponse> getByBatchCode(String batchCode) {
         return responseRepository.findByBatchCode(batchCode);
     }
 
-    // ✅ UPDATE
     public CandidateResponse updateResponse(Long id, CandidateResponse updated) {
 
         CandidateResponse existing = responseRepository.findById(id)
@@ -84,7 +104,6 @@ public class CandidateResponseService {
         return responseRepository.save(existing);
     }
 
-    // ✅ DELETE
     public void deleteResponse(Long id) {
         responseRepository.deleteById(id);
     }

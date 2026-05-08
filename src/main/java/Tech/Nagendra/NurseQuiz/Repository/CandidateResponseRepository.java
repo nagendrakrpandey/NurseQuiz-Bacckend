@@ -1,20 +1,23 @@
 package Tech.Nagendra.NurseQuiz.Repository;
 
 import Tech.Nagendra.NurseQuiz.DTO.CandidateResponseDTO;
-import Tech.Nagendra.NurseQuiz.DTO.ExamAccessDTO;
 import Tech.Nagendra.NurseQuiz.Entity.CandidateResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CandidateResponseRepository extends JpaRepository<CandidateResponse, Long> {
+
     List<CandidateResponse> findByCandidateId(Long candidateId);
 
     List<CandidateResponse> findByBatchCode(String batchCode);
+    Optional<CandidateResponse> findByCandidateIdAndQuestionId(Long candidateId, Long questionId);
+
     @Query(value =
-            "SELECT " +
+            "SELECT DISTINCT ON (a.question_id) " +
                     "b.id AS questionId, " +
                     "b.text AS question, " +
                     "b.optiona AS optiona, " +
@@ -33,8 +36,8 @@ public interface CandidateResponseRepository extends JpaRepository<CandidateResp
                     "END AS obtMarks " +
                     "FROM candidate_responses a " +
                     "LEFT JOIN questions b ON a.question_id = b.id " +
-                    "WHERE a.candidate_id = :candidateId",
+                    "WHERE a.candidate_id = :candidateId " +
+                    "ORDER BY a.question_id, a.submit_time DESC",
             nativeQuery = true)
     List<CandidateResponseDTO> getCandidateResponseDetails(@Param("candidateId") Long candidateId);
-
 }
